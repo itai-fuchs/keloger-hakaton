@@ -1,17 +1,14 @@
-import socket
 import json
-from datetime import datetime
 import requests
 
 
 class Writer:
-    def __init__(self, file_name="data.json", url="http://127.0.0.1:5000"):
+    def __init__(self, file_name="data", url="http://127.0.0.1:5000"):
         self.backend_url = url
-        self.file_name = file_name
+        self.file_name = f"logs/log_{file_name}.json"
 
     def is_connected(self,mac="abc"):
-        response = requests.get(f"{self.backend_url}/connection")
-        print(response.status_code)
+        response = requests.get(f"{self.backend_url}/connection/{mac}")
         return response.status_code == 200
 
     def write_to_file(self, data):
@@ -42,15 +39,17 @@ class Writer:
             self.write_to_file(data)
 
 
-test = Writer()
-is_connected = test.is_connected()
-print("is_connected:",is_connected)
+
+#testing functions
 new_data={
-        "Data": "Device  successfully",
-        "Date": "2026-02-16 14:30:00",
-        "MAC": "00:1A:2B:3C:4D:5E"
-    }
+    "Data": "b'gAAAAABnswc_OW7K0TMWBI1Z9hPoKV9M1El2LXlj8gaOXwN89hCZm24uDqtJ7CAhb6jZYKcuaIw4Igfq39TXiDSU-a70XEXR5g=='",
+    "Date": "2026-02-16 14:30:00",
+    "MAC": "38-87-D5-0D-C6-36"
+}
+test = Writer()
+is_connected = test.is_connected(new_data["MAC"])
+print("is_connected:",is_connected)
 test.write_to_file(new_data)
 send_to_server = test.send_to_server(new_data)
-print(send_to_server)
+print("send_to_server: ", send_to_server)
 test.save_manager(new_data)

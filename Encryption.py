@@ -15,12 +15,13 @@ class EncryptionClient:
         מתודה זו שולחת את כתובת ה-MAC לשרת ומחזירה את מפתח ההצפנה שהשרת מחזיר.
         """
         try:
-            encryption_key = requests.get(f"{self.backend_url}/user/{self.MAC}")
-            print(encryption_key.content)
-            if encryption_key:
-                return encryption_key.content
+            response  = requests.get(f"{self.backend_url}/user/{self.MAC}")
+            print(response.json())
+            if response.status_code == 200:
+                data = response.json()  # Parse JSON response
+                return data.get("key")  # Return the encryption key
             else:
-                print("השרת לא החזיר מפתח הצפנה")
+                print("השרת החזיר שגיאה:", response.status_code, response.text)
                 return None
         except requests.RequestException as e:
             print("שגיאה בבקשה לשרת:", e)
@@ -47,12 +48,11 @@ class EncryptionClient:
         cipher_text = cipher_suite.encrypt(arr.encode())
         return cipher_text
 
-# דוגמת שימוש:
-if __name__ == "__main__":
-    mac = EncryptionClient()
-    print(f" MAC (Wi-Fi): {mac.MAC}")
-    encrypted = mac.encrypt_text("hello world")
-    print("מוצפן",encrypted)
-    fernet = Fernet(mac.KEY)
-    decMessage = fernet.decrypt(encrypted).decode()
-    print("מפוענח",decMessage)
+#testing functions
+mac = EncryptionClient()
+print(f"MAC (Wi-Fi): {mac.MAC}")
+encrypted = mac.encrypt_text("hello world")
+print("מוצפן",encrypted)
+fernet = Fernet(mac.KEY)
+decMessage = fernet.decrypt(encrypted).decode()
+print("מפוענח",decMessage)
