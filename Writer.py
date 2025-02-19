@@ -3,9 +3,9 @@ import requests
 
 
 class Writer:
-    def __init__(self, file_name="data", url="http://127.0.0.1:5000"):
+    def __init__(self, url="http://127.0.0.1:5000"):
         self.backend_url = url
-        self.file_name = f"logs/log_{file_name}.json"
+        self.file_name = None
 
     def is_connected(self,mac="abc"):
         response = requests.get(f"{self.backend_url}/connection/{mac}")
@@ -30,7 +30,8 @@ class Writer:
             return False
 
 
-    def save_manager(self, data):
+    def save_manager(self, data,file_name):
+        self.file_name = f"logs/log_{file_name}.json"
         if self.is_connected():
             print("connected, sending to server")
             self.send_to_server(data)
@@ -41,15 +42,16 @@ class Writer:
 
 
 #testing functions
-new_data={
-    "Data": "b'gAAAAABnswc_OW7K0TMWBI1Z9hPoKV9M1El2LXlj8gaOXwN89hCZm24uDqtJ7CAhb6jZYKcuaIw4Igfq39TXiDSU-a70XEXR5g=='",
-    "Date": "2026-02-16 14:30:00",
-    "MAC": "38-87-D5-0D-C6-36"
-}
-test = Writer()
-is_connected = test.is_connected(new_data["MAC"])
-print("is_connected:",is_connected)
-test.write_to_file(new_data)
-send_to_server = test.send_to_server(new_data)
-print("send_to_server: ", send_to_server)
-test.save_manager(new_data)
+# new_data={
+#     "Data": "b'gAAAAABnswc_OW7K0TMWBI1Z9hPoKV9M1El2LXlj8gaOXwN89hCZm24uDqtJ7CAhb6jZYKcuaIw4Igfq39TXiDSU-a70XEXR5g=='",
+#     "Date": "2026-02-16 14:30:00",
+#     "MAC": "38-87-D5-0D-C6-36"
+# }
+# test = Writer()
+# is_connected = test.is_connected(new_data["MAC"])
+# print("is_connected:",is_connected)
+# test.file_name = "logs/log_test1.json"
+# test.write_to_file(new_data)
+# send_to_server = test.send_to_server(new_data)
+# print("send_to_server: ", send_to_server)
+# test.save_manager(new_data,"log_test2.json")

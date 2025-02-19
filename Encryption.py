@@ -7,7 +7,10 @@ class EncryptionClient:
     def __init__(self,url="http://127.0.0.1:5000"):
         self.backend_url = url
         self.MAC = self.get_mac_address()
+        print("mac: ",self.MAC)
         self.KEY = self.get_key()
+        print("key: ",self.KEY)
+
 
 
     def get_key(self):
@@ -45,14 +48,14 @@ class EncryptionClient:
 
     def encrypt_text(self,arr):
         cipher_suite = Fernet(self.KEY)
-        cipher_text = cipher_suite.encrypt(arr.encode())
+        cipher_text = cipher_suite.encrypt(str(arr).encode())
         return cipher_text
 
 #testing functions
-mac = EncryptionClient()
-print(f"MAC (Wi-Fi): {mac.MAC}")
-encrypted = mac.encrypt_text("hello world")
-print("מוצפן",encrypted)
-fernet = Fernet(mac.KEY)
-decMessage = fernet.decrypt(encrypted).decode()
-print("מפוענח",decMessage)
+# mac = EncryptionClient()
+# print(f"MAC (Wi-Fi): {mac.MAC}")
+# encrypted = mac.encrypt_text("hello world")
+# print("מוצפן",encrypted)
+# fernet = Fernet(mac.KEY)
+# decMessage = fernet.decrypt(encrypted).decode()
+# print("מפוענח",decMessage)
