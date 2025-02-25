@@ -1,6 +1,7 @@
 import psutil
 from cryptography.fernet import Fernet
 import requests
+from requests import RequestException
 
 
 class EncryptionClient:
@@ -31,7 +32,8 @@ class EncryptionClient:
                 return None
         except requests.RequestException as e:
             print("שגיאה בבקשה לשרת:", e)
-            return None
+            raise RequestException
+            # return None
 
 
 

