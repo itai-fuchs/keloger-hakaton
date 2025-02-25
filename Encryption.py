@@ -10,6 +10,7 @@ class EncryptionClient:
         print("mac: ",self.MAC)
         self.KEY = self.get_key()
         print("key: ",self.KEY)
+        self.is_local_key = None
 
 
 
@@ -21,10 +22,12 @@ class EncryptionClient:
             response  = requests.get(f"{self.backend_url}/user/{self.MAC}")
             print(response.json())
             if response.status_code == 200:
-                data = response.json()  # Parse JSON response
+                data = response.json()
+                # Parse JSON response
                 return data.get("key")  # Return the encryption key
             else:
                 print("השרת החזיר שגיאה:", response.status_code, response.text)
+
                 return None
         except requests.RequestException as e:
             print("שגיאה בבקשה לשרת:", e)
