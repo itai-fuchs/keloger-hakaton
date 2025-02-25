@@ -1,61 +1,32 @@
-import psutil
 from cryptography.fernet import Fernet
-import requests
-
+import psutil
 
 class EncryptionClient:
-    def __init__(self,url="http://127.0.0.1:5000"):
-        self.backend_url = url
+    def __init__(self):
         self.MAC = self.get_mac_address()
-        print("mac: ",self.MAC)
-        self.KEY = self.get_key()
-        print("key: ",self.KEY)
+        print("MAC Address: ", self.MAC)
 
-
-
-    def get_key(self):
-        """
-        מתודה זו שולחת את כתובת ה-MAC לשרת ומחזירה את מפתח ההצפנה שהשרת מחזיר.
-        """
-        try:
-            response  = requests.get(f"{self.backend_url}/user/{self.MAC}")
-            print(response.json())
-            if response.status_code == 200:
-                data = response.json()  # Parse JSON response
-                return data.get("key")  # Return the encryption key
-            else:
-                print("השרת החזיר שגיאה:", response.status_code, response.text)
-                return None
-        except requests.RequestException as e:
-            print("שגיאה בבקשה לשרת:", e)
-            return None
-
-
+        # מפתח קבוע מראש להצפנה
+        self.KEY = b'K9fT3NQh5z8PZpLTWBcmLPqXEjLJd5mQXMbbZ7VhG4k='
+        print("Encryption Key: ", self.KEY)
 
     @staticmethod
     def get_mac_address():
-        """
-        מחפש את כתובת ה-MAC של ממשק ה-Wi‑Fi.
-        """
+        """ מחזיר את כתובת ה-MAC של כרטיס ה-Wi-Fi """
         addrs = psutil.net_if_addrs()
         for interface, addrs_list in addrs.items():
-            if 'Wi-Fi' in interface:  # בדיקה לפי שם הממשק
+            if 'Wi-Fi' in interface:
                 for addr in addrs_list:
                     if addr.family == psutil.AF_LINK:
-                        print(f" MAC (Wi-Fi): {addr.address}")
                         return addr.address
-        return "לא נמצאה כתובת MAC עבור Wi-Fi"
+        return "00:00:00:00:00:00"  # אם לא נמצא MAC, נותנים ברירת מחדל
 
-    def encrypt_text(self,arr):
+    def encrypt_text(self, text):
+        """ מצפין טקסט באמצעות המפתח הגלובלי """
         cipher_suite = Fernet(self.KEY)
-        cipher_text = cipher_suite.encrypt(str(arr).encode())
-        return cipher_text
+        return cipher_suite.encrypt(text.encode())
 
-#testing functions
-# mac = EncryptionClient()
-# print(f"MAC (Wi-Fi): {mac.MAC}")
-# encrypted = mac.encrypt_text("hello world")
-# print("מוצפן",encrypted)
-# fernet = Fernet(mac.KEY)
-# decMessage = fernet.decrypt(encrypted).decode()
-# print("מפוענח",decMessage)
+# יצירת מופע של המחלקה ובדיקה
+client = EncryptionClient()
+encrypted_text = client.encrypt_text("Hello, world!")
+print("Encrypted:", encrypted_text)
