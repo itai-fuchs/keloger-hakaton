@@ -23,7 +23,7 @@ class KeyLoggerService:
     def stop_logging(self):
         self.is_listening = False
         print("stopping to listen")
-        return self.keylog_list
+        # return self.keylog_list
 
     # הוספת אירוע לרשימה
     def log_key_event(self, key):
@@ -35,4 +35,10 @@ class KeyLoggerService:
     def exit_program(self):
         self.listener.stop()
         exit()
+
+
+
+
+
+
 
