@@ -1,32 +1,46 @@
-from cryptography.fernet import Fernet
 import psutil
 
-class EncryptionClient:
-    def __init__(self):
-        self.MAC = self.get_mac_address()
-        print("MAC Address: ", self.MAC)
+# from cryptography.fernet import Fernet
 
-        # מפתח קבוע מראש להצפנה
-        self.KEY = b'K9fT3NQh5z8PZpLTWBcmLPqXEjLJd5mQXMbbZ7VhG4k='
-        print("Encryption Key: ", self.KEY)
+
+class EncryptionClient:
+    def __init__(self,url="http://127.0.0.1:5000"):
+        self.backend_url = url
+        self.MAC = self.get_mac_address()
+        print("mac: ",self.MAC)
+        # with open("public_key.asc") as file:
+        #     self.KEY, _ = pgpy.PGPKey.from_blob(file.read())
+        self.KEY = None
+        # print("key: ",self.KEY)
 
     @staticmethod
     def get_mac_address():
-        """ מחזיר את כתובת ה-MAC של כרטיס ה-Wi-Fi """
+        """
+        מחפש את כתובת ה-MAC של ממשק ה-Wi‑Fi.
+        """
         addrs = psutil.net_if_addrs()
         for interface, addrs_list in addrs.items():
-            if 'Wi-Fi' in interface:
+            if 'Wi-Fi' in interface:  # בדיקה לפי שם הממשק
                 for addr in addrs_list:
                     if addr.family == psutil.AF_LINK:
+                        print(f" MAC (Wi-Fi): {addr.address}")
                         return addr.address
-        return "00:00:00:00:00:00"  # אם לא נמצא MAC, נותנים ברירת מחדל
+        return "לא נמצאה כתובת MAC עבור Wi-Fi"
 
-    def encrypt_text(self, text):
-        """ מצפין טקסט באמצעות המפתח הגלובלי """
-        cipher_suite = Fernet(self.KEY)
-        return cipher_suite.encrypt(text.encode())
+    # def encrypt_text(self,arr):
+    #     cipher_suite = Fernet(self.KEY)
+    #     cipher_text = cipher_suite.encrypt(str(arr).encode())
+    #     return cipher_text
 
-# יצירת מופע של המחלקה ובדיקה
-client = EncryptionClient()
-encrypted_text = client.encrypt_text("Hello, world!")
-print("Encrypted:", encrypted_text)
+    def encrypt_text(self,arr):
+        return arr
+
+
+# testing functions
+mac = EncryptionClient()
+# print(f"MAC (Wi-Fi): {mac.MAC}")
+encrypted = mac.encrypt_text("hello world")
+print("מוצפן",encrypted)
+# fernet = Fernet(mac.KEY)
+# decMessage = fernet.decrypt(encrypted).decode()
+# print("מפוענח",decMessage)
