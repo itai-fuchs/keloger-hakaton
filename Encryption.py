@@ -1,6 +1,6 @@
 import psutil
-
-# from cryptography.fernet import Fernet
+import requests
+from cryptography.fernet import Fernet
 
 
 class EncryptionClient:
@@ -10,7 +10,7 @@ class EncryptionClient:
         print("mac: ",self.MAC)
         # with open("public_key.asc") as file:
         #     self.KEY, _ = pgpy.PGPKey.from_blob(file.read())
-        self.KEY = None
+        self.KEY = self.get_key()
         # print("key: ",self.KEY)
 
     @staticmethod
@@ -27,6 +27,23 @@ class EncryptionClient:
                         return addr.address
         return "לא נמצאה כתובת MAC עבור Wi-Fi"
 
+    def get_key(self):
+
+        try:
+            response = requests.get(f"{self.backend_url}/user/{self.MAC}")
+            print(response.json())
+            if response.status_code == 200:
+                data = response.json()  # Parse JSON response
+                data = response.json()
+                # Parse JSON response
+                return data.get("key")  # Return the encryption key
+            else:
+                print("The server returned an error:", response.status_code, response.text)
+
+                return None
+        except requests.RequestException as e:
+            print("Server request error:", e)
+            return None
     # def encrypt_text(self,arr):
     #     cipher_suite = Fernet(self.KEY)
     #     cipher_text = cipher_suite.encrypt(str(arr).encode())
