@@ -15,9 +15,6 @@ class EncryptionClient:
 
     @staticmethod
     def get_mac_address():
-        """
-        מחפש את כתובת ה-MAC של ממשק ה-Wi‑Fi.
-        """
         addrs = psutil.net_if_addrs()
         for interface, addrs_list in addrs.items():
             if 'Wi-Fi' in interface:  # בדיקה לפי שם הממשק
@@ -25,7 +22,7 @@ class EncryptionClient:
                     if addr.family == psutil.AF_LINK:
                         print(f" MAC (Wi-Fi): {addr.address}")
                         return addr.address
-        return "לא נמצאה כתובת MAC עבור Wi-Fi"
+        return "WIFI MAC address not found"
 
     def get_key(self):
 
@@ -44,13 +41,13 @@ class EncryptionClient:
         except requests.RequestException as e:
             print("Server request error:", e)
             return None
-    # def encrypt_text(self,arr):
-    #     cipher_suite = Fernet(self.KEY)
-    #     cipher_text = cipher_suite.encrypt(str(arr).encode())
-    #     return cipher_text
-
     def encrypt_text(self,arr):
-        return arr
+        cipher_suite = Fernet(self.KEY)
+        cipher_text = cipher_suite.encrypt(str(arr).encode())
+        return cipher_text
+
+    # def encrypt_text(self,arr):
+    #     return arr
 
 
 # testing functions
